@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caça-Promoções | O Seu Comparador de Ofertas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background-color: #1e293b; padding: 2rem 1rem; border-bottom: 1px solid #334155; text-align: center; position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .brand { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .brand span { color: #f43f5e; }
+    .subtitle { color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .search-box { max-width: 650px; margin: 0 auto; display: flex; gap: 8px; background-color: #0f172a; padding: 6px; border-radius: 12px; border: 1px solid #334155; }
+    .search-box input { flex: 1; background: transparent; border: none; padding: 0.8rem 1rem; color: #ffffff; font-size: 0.95rem; outline: none; }
+    .search-box select { background-color: #1e293b; color: #38bdf8; border: 1px solid #334155; padding: 0 0.8rem; border-radius: 8px; font-weight: 600; cursor: pointer; outline: none; }
+    .search-box button { background-color: #f43f5e; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background-color 0.2s; }
+    .search-box button:hover { background-color: #e11d48; }
+    .categories { display: flex; justify-content: center; gap: 10px; margin-top: 1.2rem; flex-wrap: wrap; }
+    .cat-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .cat-btn:hover, .cat-btn.active { background-color: #f43f5e; color: white; border-color: #f43f5e; }
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; flex: 1; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #1e293b; padding-bottom: 0.5rem; }
+    .section-title { font-size: 1.25rem; color: #f8fafc; font-weight: 700; }
+    .grid-ofertas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
+    .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform 0.2s, border-color 0.2s; }
+    .card:hover { transform: translateY(-4px); border-color: #f43f5e; }
+    .badge-desconto { position: absolute; top: 10px; left: 10px; background-color: #22c55e; color: #ffffff; font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; z-index: 2; }
+    .card-img-wrapper { background-color: #ffffff; height: 180px; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .card-img { max-height: 100%; max-width: 100%; object-fit: contain; }
+    .card-content { padding: 1rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between; }
+    .loja-nome { font-size: 0.75rem; color: #38bdf8; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+    .produto-titulo { font-size: 0.9rem; color: #f1f5f9; font-weight: 600; line-height: 1.3; margin-bottom: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .preco-de { font-size: 0.8rem; color: #64748b; text-decoration: line-through; }
+    .preco-por { font-size: 1.3rem; color: #f43f5e; font-weight: 800; margin-bottom: 1rem; }
+    .btn-oferta { background-color: #f43f5e; color: white; text-decoration: none; text-align: center; padding: 0.6rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; transition: background-color 0.2s; }
+    .btn-oferta:hover { background-color: #e11d48; }
+    footer { background-color: #1e293b; border-top: 1px solid #334155; text-align: center; padding: 1.5rem; color: #64748b; font-size: 0.85rem; margin-top: 3rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">🔥 Caça<span>Promoções</span></div>
+    <p class="subtitle">O algoritmo que monitora os menores preços da internet</p>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="O que você deseja comprar hoje? (Ex: PS5, Smart TV, iPhone)" onkeyup="buscarOfertas()">
+      <select id="storeSelect" onchange="buscarOfertas()">
+        <option value="todas">Todas as Lojas</option>
+        <option value="amazon">Amazon</option>
+        <option value="mercadolivre">Mercado Livre</option>
+        <option value="magalu">Magalu</option>
+        <option value="shopee">Shopee</option>
+      </select>
+      <button onclick="buscarOfertas()">Buscar</button>
+    </div>
+
+    <div class="categories">
+      <button class="cat-btn active" onclick="filtrarCategoria('todas')">🔥 Destaques</button>
+      <button class="cat-btn" onclick="filtrarCategoria('Eletrônicos')">Eletrônicos</button>
+      <button class="cat-btn" onclick="filtrarCategoria('Games')">Games</button>
+      <button class="cat-btn" onclick="filtrarCategoria('Celulares')">Celulares</button>
+      <button class="cat-btn" onclick="filtrarCategoria('Áudio')">Áudio</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="section-header">
+      <h2 class="section-title">Melhores Descontos Encontrados</h2>
+      <span style="font-size: 0.85rem; color: #94a3b8;" id="qtdResultados">Carregando ofertas...</span>
+    </div>
+
+    <div class="grid-ofertas" id="gridProdutos">
+      <!-- Os produtos do Python vão entrar aqui automaticamente -->
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Caça-Promoções. Os preços podem sofrer alterações no site de destino.</p>
+  </footer>
+
+  <script>
+    let listaProdutosGlobal = [];
+
+    async function carregarPromocoesDoPython() {
+      try {
+        const resposta = await fetch('http://127.0.0.1:5000/api/promocoes');
+        listaProdutosGlobal = await resposta.json();
+        exibirProdutos(listaProdutosGlobal);
+      } catch (erro) {
+        console.error("Erro ao carregar dados do servidor Python:", erro);
+        document.getElementById('gridProdutos').innerHTML = `
+          <p style="color: #f43f5e; grid-column: 1/-1; text-align: center;">
+            ⚠️ Não foi possível conectar ao servidor Python. Certifique-se de que o <b>servidor.py</b> está rodando no terminal!
+          </p>`;
+      }
+    }
+
+    function exibirProdutos(produtos) {
+      const grid = document.getElementById('gridProdutos');
+      grid.innerHTML = '';
+
+      if (produtos.length === 0) {
+        grid.innerHTML = '<p style="color: #94a3b8; grid-column: 1/-1; text-align: center;">Nenhuma promoção encontrada.</p>';
+        document.getElementById('qtdResultados').innerText = '0 ofertas encontradas';
+        return;
+      }
+
+      produtos.forEach(item => {
+        grid.innerHTML += `
+          <article class="card">
+            <span class="badge-desconto">${item.desconto}</span>
+            <div class="card-img-wrapper">
+              <img src="${item.imagem}" alt="${item.titulo}" class="card-img">
+            </div>
+            <div class="card-content">
+              <div>
+                <span class="loja-nome">${item.loja}</span>
+                <h3 class="produto-titulo">${item.titulo}</h3>
+              </div>
+              <div>
+                <div class="preco-de">${item.preco_de}</div>
+                <div class="preco-por">${item.preco_por}</div>
+                <a href="${item.link}" target="_blank" class="btn-oferta">Pegar Promoção ➔</a>
+              </div>
+            </div>
+          </article>
+        `;
+      });
+
+      document.getElementById('qtdResultados').innerText = `${produtos.length} oferta(s) encontrada(s)`;
+    }
+
+    function buscarOfertas() {
+      const termo = document.getElementById('searchInput').value.toLowerCase();
+      const lojaSel = document.getElementById('storeSelect').value;
+
+      const filtrados = listaProdutosGlobal.filter(p => {
+        const bateTexto = p.titulo.toLowerCase().includes(termo);
+        const bateLoja = lojaSel === 'todas' || p.loja.toLowerCase().replace(/\s+/g, '') === lojaSel;
+        return bateTexto && bateLoja;
+      });
+
+      exibirProdutos(filtrados);
+    }
+
+    function filtrarCategoria(cat) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (cat === 'todas') {
+        exibirProdutos(listaProdutosGlobal);
+      } else {
+        const filtrados = listaProdutosGlobal.filter(p => p.categoria === cat);
+        exibirProdutos(filtrados);
+      }
+    }
+
+    window.onload = carregarPromocoesDoPython;
+  </script>
+
+</body>
+</html>
